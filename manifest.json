@@ -1,0 +1,27 @@
+{
+  "name": "HTTPolice-client",
+  "version": "0.0.1",
+  "manifest_version": 2,
+  "description": "",
+  "background": {
+    "scripts": [
+      "background.bundle.js"
+    ],
+    "persistent": false
+  },
+  "devtools_page": "devtools.html",
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*/*"
+      ],
+      "js": [
+        "content_script.bundle.js"
+      ]
+    }
+  ],
+  "permissions": [
+    "*://*/*"
+  ],
+  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"
+}
