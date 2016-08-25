@@ -61,7 +61,7 @@ function buildZipFile() {
   }
 
   function createZipFile() {
-    const output = fs.createWriteStream('dist/video-annotation-' + versionStr + '.zip');
+    const output = fs.createWriteStream('dist/httpolice-devtool-' + versionStr + '.zip');
     const archive = archiver('zip');
 
     archive.pipe(output);
