@@ -1,5 +1,5 @@
 {
-  "name": "httpolice-client",
+  "name": "httpolice-devtool",
   "version": "0.0.1",
   "description": "",
   "main": "devtools.js",
@@ -21,6 +21,9 @@
     "webpack": "^1.13.2"
   },
   "scripts": {
+    "build": "webpack",
+    "watch": "webpack --progress --color --watch",
+    "release": "node release.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
