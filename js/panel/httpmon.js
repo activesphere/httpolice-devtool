@@ -7,11 +7,13 @@
 import $ from 'jquery';
 import { interactionSetup, installOptions } from './interaction';
 
-const REMOTE = 'http://ec2-52-66-144-43.ap-south-1.compute.amazonaws.com:8080/har'
+const REMOTE = 'http://ec2-52-66-144-43.ap-south-1.compute.amazonaws.com:8080/har';
+const BITESIZE = 5;
 
 const globalHarLog = {
   log: null,
 };
+let entriesToProcess = [];
 
 function randomString() {
   const getRandomNum = (min, max) =>
@@ -48,6 +50,12 @@ function handleResponse(initialReq) {
       $('body').append(exchng.append(targetElems));
       interactionSetup(`section.${randomClass}`);
     }
+
+    // Looks like we are done displaying current response
+    // Now finish the remaining work (if any)
+    if (entriesToProcess.length > 0) {
+      eatEntries();
+    }
   };
 }
 
@@ -56,18 +64,7 @@ function handleError(response) {
   console.log(`${response.status} : ${response.statusText}`);
 }
 
-function processIndividualHar(req, initial = false) {
-  // get a report for this request.
-  let payload = {};
-  if (initial) {
-    globalHarLog.log = req;
-    payload = btoa(JSON.stringify(globalHarLog));
-  } else {
-    const harEntry = { ...globalHarLog };
-    harEntry.log.entries = [req];
-    payload = btoa(JSON.stringify(harEntry));
-  }
-
+function getChecked(payload, initial = false) {
   $.ajax({
     url: REMOTE,
     type: 'POST',
@@ -75,6 +72,39 @@ function processIndividualHar(req, initial = false) {
     success: handleResponse(initial),
     error: handleError,
   });
+}
+
+function eatEntries() {
+  // This removes a BITESIZEd chunk from entriesToProcess
+  const chunk = entriesToProcess.splice(0, BITESIZE);
+  const harEntry = { ...globalHarLog };
+  harEntry.log.entries = chunk;
+  const payload = btoa(JSON.stringify(harEntry));
+  getChecked(payload);
+}
+
+function feedEntries(newEntries) {
+  entriesToProcess = entriesToProcess.concat(newEntries);
+}
+
+function processIndividualHar(req, initial = false) {
+  // get a report for this request.
+  let payload = {};
+  if (initial) {
+    globalHarLog.log = { ...req };
+    payload = btoa(JSON.stringify(globalHarLog));
+  } else if (entriesToProcess.length === 0) {
+    // means we've finished all work, and ready to roll!
+    const harEntry = { ...globalHarLog };
+    harEntry.log.entries = [req];
+    payload = btoa(JSON.stringify(harEntry));
+  } else {
+    // There still some pending work. Dump this over the same pile
+    // and do nothing.
+    feedEntries([req]);
+    return;
+  }
+  getChecked(payload, initial);
 }
 
 $(document).ready(() => {
@@ -88,7 +118,9 @@ $(document).ready(() => {
     if (message.type === 'BEGIN') {
       $('.exchange').remove();
       chrome.devtools.network.getHAR((harLog) => {
-        globalHarLog.log = harLog;
+        entriesToProcess = harLog.entries.slice(5);
+        harLog.entries = harLog.entries.slice(0, 5);
+        // strip
         processIndividualHar(harLog, true);
         chrome.devtools.network
               .onRequestFinished.addListener(processIndividualHar);
