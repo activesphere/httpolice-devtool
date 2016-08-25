@@ -2,7 +2,9 @@
   "name": "httpolice-devtool",
   "version": "0.0.3",
   "manifest_version": 2,
-  "description": "",
+  "description": "A lint-tool for the HTTP",
+  "author": "ActiveSphere Technologies",
+  "homepage_url": "https://github.com/activesphere/httpolice-devtool",
   "background": {
     "scripts": [
       "background.bundle.js"
