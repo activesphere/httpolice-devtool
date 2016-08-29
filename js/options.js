@@ -40,7 +40,7 @@ function restoreDefaultValues() {
   }, () => {
     showStatus('Options restored.', '');
     document.getElementById('remote').value = REMOTE;
-  })
+  });
 }
 
 document.addEventListener('DOMContentLoaded', restoreOptions);
