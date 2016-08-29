@@ -8,7 +8,8 @@ configObj = {
     devtools: 'devtools',
     httpmon: 'httpmon',
     background: 'background',
-    content_script: 'content_script'
+    content_script: 'content_script',
+    options: 'options',
   },
   output: {
     path:     'builds',
@@ -52,7 +53,8 @@ configObj = {
       { from: 'devtools.html' },
       { from: 'icons' },
       { from: 'js/panel/httpmon.html' },
-      { from: 'manifest.json' }
+      { from: 'manifest.json' },
+      { from: 'options.html' },
     ], {
       // no specific options
     })
