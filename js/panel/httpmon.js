@@ -12,6 +12,7 @@ const globalHarLog = {
   log: null,
 };
 let entriesToProcess = [];
+let userRemote = REMOTE;
 
 function randomString() {
   const getRandomNum = (min, max) =>
@@ -64,7 +65,7 @@ function handleError(response) {
 
 function getChecked(payload, initial = false) {
   $.ajax({
-    url: REMOTE,
+    url: userRemote,
     type: 'POST',
     data: { payload },
     success: handleResponse(initial),
@@ -105,7 +106,29 @@ function processIndividualHar(req, initial = false) {
   getChecked(payload, initial);
 }
 
+function restoreRemoteURL() {
+  // Set userRemote to user defined value
+  chrome.storage.sync.get({
+    remote: REMOTE,
+  }, (items) => {
+    userRemote = items.remote;
+  });
+}
+
+function listenRemoteURLChanges() {
+  chrome.storage.onChanged.addListener((changes) => {
+    if ({}.hasOwnProperty.call(changes, 'remote')) {
+      const oldVal = changes.remote.oldValue;
+      const newVal = changes.remote.newValue;
+      userRemote = oldVal === newVal ? oldVal : newVal;
+    }
+  });
+}
+
 $(document).ready(() => {
+  restoreRemoteURL();
+  listenRemoteURLChanges();
+
   // Make a connection to the background script
   const backgroundPageConnection = chrome.runtime.connect({
     name: 'httpmon-devtools-panel',
