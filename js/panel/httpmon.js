@@ -6,9 +6,7 @@
 
 import $ from 'jquery';
 import { interactionSetup, installOptions } from './interaction';
-
-const REMOTE = 'http://ec2-52-66-144-43.ap-south-1.compute.amazonaws.com:8080/har';
-const BITESIZE = 5;
+import { REMOTE, BITESIZE } from '../defaults.js';
 
 const globalHarLog = {
   log: null,
