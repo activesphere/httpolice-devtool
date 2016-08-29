@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>My Test Extension Options</title>
+    <style>
+
+     body { padding: 10px; },
+
+     input#remote {
+       width: 100% !important;
+       margin: 10px 0 10px 0 !important;
+     },
+    </style>
+  </head>
+
+  <body>
+
+    <label>Remote Server URL
+      <input type="text" id="remote" />
+    </label>
+
+    <div id="status"></div>
+    <button id="save">Save</button>
+    <button id="restore">Restore Defaults</button>
+
+    <script src="options.bundle.js"></script>
+  </body>
+</html>
