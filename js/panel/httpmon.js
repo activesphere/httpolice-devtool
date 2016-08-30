@@ -8,6 +8,8 @@ import $ from 'jquery';
 import { interactionSetup, installOptions } from './interaction';
 import { REMOTE, BITESIZE } from '../defaults.js';
 
+import './httpmon.scss';
+
 const globalHarLog = {
   log: null,
 };
@@ -37,19 +39,24 @@ function handleResponse(initialReq) {
     const report = jresp.reports;
     const randomClass = randomString();
 
+    const exchng = $('<div class="exchange"></div>');
+    const $sections = $(report).find('section');
+
     if (initialReq) {
-      $('body').html(report);
-      interactionSetup('section');
-      installOptions();
-    } else {
-      const exchng = $('<div class="exchange"></div>');
-      const targetElems = $(report).find('section')
-                                   .addClass(randomClass)
+      // clean old junk
+      $('.exchange').remove();
+    }
+
+    if ($sections.length > 0) {
+      const targetElems = $sections.addClass(randomClass)
                                    .append($('<hr>'));
       $('body').append(exchng.append(targetElems));
       interactionSetup(`section.${randomClass}`);
-    }
 
+      if ($('.options').length === 0) {
+        installOptions();
+      }
+    }
     // Looks like we are done displaying current response
     // Now finish the remaining work (if any)
     if (entriesToProcess.length > 0) {
