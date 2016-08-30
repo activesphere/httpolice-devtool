@@ -40,8 +40,8 @@ configObj = {
         },
       },
       {
-        test: /\.less/,
-        loaders: ['style', 'css', 'less']
+        test: /\.scss$/,
+        loaders: ['style', 'css', 'sass']
       },
     ],
   },
