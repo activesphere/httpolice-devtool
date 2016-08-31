@@ -39,18 +39,24 @@ function handleResponse(initialReq) {
     const report = jresp.reports;
     const randomClass = randomString();
 
-    const exchng = $('<div class="exchange"></div>');
     const $sections = $(report).find('section');
-
     if (initialReq) {
       // clean old junk
       $('.exchange').remove();
     }
 
     if ($sections.length > 0) {
-      const targetElems = $sections.addClass(randomClass)
-                                   .append($('<hr>'));
-      $('body').append(exchng.append(targetElems));
+      const $targetElems = [];
+      for (let i = 0, len = $sections.length; i < len; i += 2) {
+        const $exchng = $('<div class="exchange"></div>');
+        $exchng.append($sections[i]);
+        $exchng.append('<hr>');
+        $exchng.append($sections[i + 1]);
+        $exchng.append('<hr>');
+        $targetElems.push($exchng);
+      }
+
+      $('body').append($targetElems);
       interactionSetup(`section.${randomClass}`);
 
       if ($('.options').length === 0) {
