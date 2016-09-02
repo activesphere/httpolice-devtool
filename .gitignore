@@ -4,3 +4,7 @@
 node_modules
 builds
 dist
+hpoliced.egg-info
+MANIFEST
+*pyc
+
