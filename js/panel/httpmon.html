@@ -5,8 +5,31 @@
     <script src="httpmon.bundle.js"></script>
   </head>
   <body class="report">
-    <h1>HTTPolice Report</h1>
-    <hr>
-    <!-- This is where we put the reports. Right into the body. -->
+    <div class="container">
+      <!-- Example row of columns -->
+      <div class="control-bar row">
+        <div class="input-group">
+          <input type="text" class="form-control" aria-label="..." placeholder="Search for ...">
+          <!-- <span class="input-group-addon">
+               <input type="checkbox" id="comments-checkbox" aria-label="...">
+               <label>Show commends and warnings</label>
+               </span> -->
+          <span class="input-group-addon">
+            <input type="checkbox" id="static-checkbox" aria-label="..." checked>
+            <label>Show static content requests</label>
+          </span>
+          <span class="input-group-addon">
+            <input type="checkbox" id="third-party-checkbox" aria-label="..." checked>
+            <label>Show third party requests</label>
+          </span>
+        </div><!-- /input-group -->
+      </div>
+
+      <table class="table">
+        <tbody>
+          <!-- This is where all the 'exchage' rows will be -->
+        </tbody>
+      </table>
+    </div> <!-- /container -->
   </body>
 </html>

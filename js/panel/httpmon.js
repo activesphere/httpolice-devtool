@@ -5,14 +5,26 @@
 /* global alert */
 
 import $ from 'jquery';
-import { interactionSetup, installOptions } from './interaction';
+// import { interactionSetup, installOptions } from './interaction';
 import { REMOTE, BITESIZE } from '../defaults.js';
 
+import './base.scss';
 import './httpmon.scss';
+
+const searchBarSelector = '.control-bar input[type="text"]';
+
+let searchQuery = '';
+// let showComments = false;
+let showStaticContentReq = true;
+let showThirdPartyReq = true;
+
+const globalExchanges = [];
+const metadataIndex = [];
 
 const globalHarLog = {
   log: null,
 };
+
 let entriesToProcess = [];
 let userRemote = REMOTE;
 
@@ -33,6 +45,43 @@ function randomString() {
   return chars.join('');
 }
 
+function strip(text, type) {
+  const TITLE_LIMIT = 97;
+  if (text.length > TITLE_LIMIT && type === 'title') {
+    return `${text.slice(0, TITLE_LIMIT)}...`;
+  }
+  return text;
+}
+
+function getTableRow($request, $response, id) {
+  const tableRow = $(
+    `<tr index="${id}" state="collapsed">
+       <th></th>
+       <td></td>
+     </tr>`
+  );
+
+  const $target = $request.find('.message-display h2');
+  const cleanTarget = strip($target.find('code span:eq(1)').text(), 'title');
+
+  $target.find('code span:eq(1)').text(cleanTarget);
+
+  tableRow.find('th').append($target);
+  // the left side of the row
+  tableRow.find('td')
+          .append($request.find('.error h3'))
+          .append($response.find('.error h3'))
+          .append($request.find('.comment h3'))
+          .append($response.find('.comment h3'));
+  return tableRow;
+}
+
+function visibilityByFlags(staticContentReq, thirdPartyReq) {
+  return (!staticContentReq && !thirdPartyReq) ||
+         staticContentReq === showStaticContentReq ||
+         thirdPartyReq === showThirdPartyReq;
+}
+
 function handleResponse(initialReq) {
   return (resp) => {
     const jresp = JSON.parse(resp);
@@ -46,21 +95,45 @@ function handleResponse(initialReq) {
     }
 
     if ($sections.length > 0) {
-      const $targetElems = [];
       for (let i = 0, len = $sections.length; i < len; i += 2) {
-        const $exchng = $('<div class="exchange"></div>');
-        $exchng.append($sections[i]);
-        $exchng.append('<hr>');
-        $exchng.append($sections[i + 1]);
-        $exchng.append('<hr>');
-        $targetElems.push($exchng);
+        const currentId = globalExchanges.length;
+        const $exchng = $(`<div class="exchange" e-index="${currentId}"></div>`);
+        const $request = $($sections[i]);
+        const $response = $($sections[i + 1]);
+
+        // get some metadata about the request to allow searching, filtering
+        const url = $request.find('h2 code span:eq(1)').text();
+        const staticContentReq = url.split('/').slice(-1).pop().search(/\./) > -1;
+        const thirdPartyReq = !url.startsWith('/');
+
+        metadataIndex.push({
+          id: currentId, url, staticContentReq, thirdPartyReq,
+        });
+
+        $exchng.append($request.addClass(randomClass))
+               .append('<hr>')
+               .append($response.addClass(randomClass))
+               .append('<hr>');
+
+        const collapsed = $(getTableRow($request.clone(), $response.clone(), currentId));
+        const expanded = $exchng;
+        globalExchanges.push({
+          expanded,
+          collapsed,
+        });
+
+        // apply css rule before inserting
+        if (visibilityByFlags(staticContentReq, thirdPartyReq)) {
+          collapsed.css('display', 'table-row');
+        } else {
+          collapsed.css('display', 'none');
+        }
+        // also push into the table
+        $('tbody').append(collapsed);
       }
 
-      $('body').append($targetElems);
-      interactionSetup(`section.${randomClass}`);
-
       if ($('.options').length === 0) {
-        installOptions();
+        // installOptions();
       }
     }
     // Looks like we are done displaying current response
@@ -138,6 +211,56 @@ function listenRemoteURLChanges() {
   });
 }
 
+function toggleExpandedView(e) {
+  e.preventDefault();
+  const $item = $(this);
+  const state = $item.attr('state');
+  const index = $item.attr('index');
+  if (state === 'collapsed') {
+    const expanded = globalExchanges[Number(index)].expanded;
+    $(this).after(expanded);
+    $(this).attr('state', 'expanded');
+  } else {
+    $(`div.exchange[e-index="${index}"]`).remove();
+    $(this).attr('state', 'collapsed');
+  }
+}
+
+function reloadRows() {
+  const idsToShow = metadataIndex.filter(
+    val => val.url.search(searchQuery) > -1 &&
+         visibilityByFlags(val.staticContentReq, val.thirdPartyReq)
+  ).map(val => val.id);
+
+  $('tr').each(function scroller() {
+    const index = Number($(this).attr('index'));
+    if (idsToShow.includes(index)) {
+      $(this).css('display', 'table-row');
+    } else {
+      $(this).css('display', 'none');
+    }
+  });
+}
+
+function searchHandler(e) {
+  if (e.which === 13) e.preventDefault();
+  searchQuery = $(searchBarSelector).val().trim();
+  reloadRows();
+}
+
+function checkboxHandler() {
+  const which = $(this).attr('id');
+  /* if (which === 'comments-checkbox') {
+   *   showComments = $(this).is(':checked');
+   * }*/
+  if (which === 'static-checkbox') {
+    showStaticContentReq = $(this).is(':checked');
+  } else if (which === 'third-party-checkbox') {
+    showThirdPartyReq = $(this).is(':checked');
+  }
+  reloadRows();
+}
+
 $(document).ready(() => {
   restoreRemoteURL();
   listenRemoteURLChanges();
@@ -166,4 +289,10 @@ $(document).ready(() => {
     name: 'init',
     tabId: chrome.devtools.inspectedWindow.tabId,
   });
+
+  // hook up functions to Expand, and Collapse the rows
+  $('table').on('click', 'tr', toggleExpandedView);
+  // handle Search
+  $(searchBarSelector).keydown(searchHandler);
+  $('input[type="checkbox"]').change(checkboxHandler);
 });
