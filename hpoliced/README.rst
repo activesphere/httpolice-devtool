@@ -13,13 +13,13 @@ This will start the server at port ``8080``
 
 ::
 
-    $ httpolice-web
+    $ hpoliced
 
 To specify an arbitrary port number
 
 ::
 
-    $ httpolice-web -p <port>
+    $ hpoliced -p <port>
 
 .. _HTTPolice: https://github.com/vfaronov/httpolice
 .. _HTTPolice-devtool: https://github.com/activesphere/httpolice-devtool
