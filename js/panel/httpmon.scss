@@ -2,6 +2,8 @@
  * Common styles
  ****************************************************************/
 
+$border-color: gainsboro;
+
 body {
     color: black;
     font-family: sans-serif;
@@ -86,7 +88,8 @@ body.report {
 
 div.exchange {
     background: white;
-    margin-top: 3em;
+    width: 120%;
+    /* margin-top: 3em; */
 }
 
 @media screen {
@@ -94,7 +97,9 @@ div.exchange {
         /* Bottom padding is smaller
          * because there is an invisible ``hr`` there. */
         padding: 2em 2em 1.5em 2em;
-        border: solid thin darkgray;
+        border-top: solid thin $border-color;
+        border-left: solid thin $border-color;
+        border-right: solid thin $border-color;
     }
 }
 
@@ -105,12 +110,6 @@ div.message-display {
 .exchange > section:not(:first-child) div.message-display {
     /* Spacing between messages within one exchange. */
     margin-top: 2em;
-}
-
-p.message-remark {
-    margin: 0 1em 0.5em 0;
-    color: gray;
-    overflow: auto;
 }
 
 .message-display h2 {
