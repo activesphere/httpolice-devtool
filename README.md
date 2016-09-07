@@ -24,6 +24,7 @@ Now change the server URL in the extension (see below)
 
 
 >The extension is set to use a remote server by default, which can be easily changed to use one that runs on local computer.
+
 >1. Find and click on `H` in the top right corner of Chrome toolbar.
 >2. Select `Options` from under the menu. This will show a box where you can set your own server address.
 
@@ -41,5 +42,3 @@ $ npm run build
 
 This will build the extension under `builds` directory. Follow [this guide](http://stackoverflow.com/a/24577660) to install it in Chrome as an unpackaged extension.
 
-
----
