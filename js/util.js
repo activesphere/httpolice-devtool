@@ -30,8 +30,10 @@ export function visibilityByFlags(
   staticContentReq, thirdPartyReq, showStaticContentReq, showThirdPartyReq
 ) {
   return (!staticContentReq && !thirdPartyReq) ||
-         staticContentReq === showStaticContentReq ||
-         thirdPartyReq === showThirdPartyReq;
+         (showStaticContentReq &&
+          (staticContentReq === showStaticContentReq)) ||
+         (showThirdPartyReq &&
+          (thirdPartyReq === showThirdPartyReq));
 }
 
 
