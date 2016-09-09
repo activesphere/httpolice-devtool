@@ -46,8 +46,11 @@ function handleResponse(initialReq) {
       for (let i = 0, len = $sections.length; i < len; i += 2) {
         const currentId = globalExchanges.length;
         const $exchng = $(`<div class="exchange" e-index="${currentId}"></div>`);
-        const $request = $($sections[i]);
-        const $response = $($sections[i + 1]);
+        const $sec1 = $($sections[i]);
+        const $sec2 = $($sections[i + 1]);
+
+        const [$request, $response] = $sec2.find('.StatusCode').length ?
+                                      [$sec1, $sec2] : [$sec2, $sec1];
 
         // get some metadata about the request to allow searching, filtering
         const url = $request.find('h2 code span:eq(1)').text();
