@@ -7,6 +7,7 @@
 import $ from 'jquery';
 // import { interactionSetup, installOptions } from './interaction';
 import { REMOTE, BITESIZE } from '../defaults.js';
+import { randomString, visibilityByFlags, getTableRow } from '../util.js';
 
 import './base.scss';
 import './httpmon.scss';
@@ -28,59 +29,6 @@ const globalHarLog = {
 let entriesToProcess = [];
 let userRemote = REMOTE;
 
-function randomString() {
-  const getRandomNum = (min, max) =>
-    Math.floor(Math.random() * ((max - min) + 1)) + min;
-
-  const length = getRandomNum(10, 14);
-  const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
-  let chars = [];
-
-  for (let i = 0; i < length; i++) {
-    chars = [
-      ...chars,
-      possible.charAt(Math.floor(Math.random() * possible.length)),
-    ];
-  }
-  return chars.join('');
-}
-
-function strip(text, type) {
-  const TITLE_LIMIT = 97;
-  if (text.length > TITLE_LIMIT && type === 'title') {
-    return `${text.slice(0, TITLE_LIMIT)}...`;
-  }
-  return text;
-}
-
-function getTableRow($request, $response, id) {
-  const tableRow = $(
-    `<tr index="${id}" state="collapsed">
-       <th></th>
-       <td></td>
-     </tr>`
-  );
-
-  const $target = $request.find('.message-display h2');
-  const cleanTarget = strip($target.find('code span:eq(1)').text(), 'title');
-
-  $target.find('code span:eq(1)').text(cleanTarget);
-
-  tableRow.find('th').append($target);
-  // the left side of the row
-  tableRow.find('td')
-          .append($request.find('.error h3'))
-          .append($response.find('.error h3'))
-          .append($request.find('.comment h3'))
-          .append($response.find('.comment h3'));
-  return tableRow;
-}
-
-function visibilityByFlags(staticContentReq, thirdPartyReq) {
-  return (!staticContentReq && !thirdPartyReq) ||
-         staticContentReq === showStaticContentReq ||
-         thirdPartyReq === showThirdPartyReq;
-}
 
 function handleResponse(initialReq) {
   return (resp) => {
@@ -123,7 +71,8 @@ function handleResponse(initialReq) {
         });
 
         // apply css rule before inserting
-        if (visibilityByFlags(staticContentReq, thirdPartyReq)) {
+        if (visibilityByFlags(staticContentReq, thirdPartyReq,
+                              showStaticContentReq, showThirdPartyReq)) {
           collapsed.css('display', 'table-row');
         } else {
           collapsed.css('display', 'none');
@@ -229,7 +178,8 @@ function toggleExpandedView(e) {
 function reloadRows() {
   const idsToShow = metadataIndex.filter(
     val => val.url.search(searchQuery) > -1 &&
-         visibilityByFlags(val.staticContentReq, val.thirdPartyReq)
+         visibilityByFlags(val.staticContentReq, val.thirdPartyReq,
+                           showStaticContentReq, showThirdPartyReq)
   ).map(val => val.id);
 
   $('tr').each(function scroller() {
@@ -250,9 +200,6 @@ function searchHandler(e) {
 
 function checkboxHandler() {
   const which = $(this).attr('id');
-  /* if (which === 'comments-checkbox') {
-   *   showComments = $(this).is(':checked');
-   * }*/
   if (which === 'static-checkbox') {
     showStaticContentReq = $(this).is(':checked');
   } else if (which === 'third-party-checkbox') {
