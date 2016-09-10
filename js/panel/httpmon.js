@@ -43,51 +43,60 @@ function handleResponse(initialReq) {
     }
 
     if ($sections.length > 0) {
-      for (let i = 0, len = $sections.length; i < len; i += 2) {
-        const currentId = globalExchanges.length;
-        const $exchng = $(`<div class="exchange" e-index="${currentId}"></div>`);
+      let i = 0;
+      const len = $sections.length;
+      while (i < len) {
         const $sec1 = $($sections[i]);
         const $sec2 = $($sections[i + 1]);
+        // Even when the requests fail, they end up in the HAR we get from devtools
+        // API. In theses cases, the requests don't have a corresponding responses,
+        // so we are going to skip them (the failed requests)
+        const consecutiveRequests = !$sec1.find('.StatusCode').length &&
+                                    !$sec2.find('.StatusCode').length;
 
-        const [$request, $response] = $sec2.find('.StatusCode').length ?
-                                      [$sec1, $sec2] : [$sec2, $sec1];
-
-        // get some metadata about the request to allow searching, filtering
-        const url = $request.find('h2 code span:eq(1)').text();
-        const staticContentReq = url.split('/').slice(-1).pop().search(/\./) > -1;
-        const thirdPartyReq = !url.startsWith('/');
-
-        metadataIndex.push({
-          id: currentId, url, staticContentReq, thirdPartyReq,
-        });
-
-        $exchng.append($request)
-               .append('<hr>')
-               .append($response)
-               .append('<hr>');
-
-        const collapsed = $(getTableRow($request.clone(), $response.clone(), currentId));
-        const expanded = $exchng;
-        globalExchanges.push({
-          expanded,
-          collapsed,
-        });
-
-        // apply css rule before inserting
-        if (visibilityByFlags(staticContentReq, thirdPartyReq,
-                              showStaticContentReq, showThirdPartyReq)) {
-          collapsed.css('display', 'table-row');
+        if (consecutiveRequests) {
+          i += 1;
         } else {
-          collapsed.css('display', 'none');
-        }
-        // also push into the table
-        $('tbody').append(collapsed);
-      }
+          const currentId = globalExchanges.length;
+          const $exchng = $(`<div class="exchange" e-index="${currentId}"></div>`);
+          const [$request, $response] = $sec2.find('.StatusCode').length ?
+                                        [$sec1, $sec2] : [$sec2, $sec1];
 
-      if ($('.options').length === 0) {
-        // installOptions();
+          // get some metadata about the request to allow searching, filtering
+          const url = $request.find('h2 code span:eq(1)').text();
+          const staticContentReq = url.split('/').slice(-1).pop().search(/\./) > -1;
+          const thirdPartyReq = !url.startsWith('/');
+
+          metadataIndex.push({
+            id: currentId, url, staticContentReq, thirdPartyReq,
+          });
+
+          $exchng.append($request)
+                 .append('<hr>')
+                 .append($response)
+                 .append('<hr>');
+
+          const collapsed = $(getTableRow($request.clone(), $response.clone(), currentId));
+          const expanded = $exchng;
+          globalExchanges.push({
+            expanded,
+            collapsed,
+          });
+
+          // apply css rule before inserting
+          if (visibilityByFlags(staticContentReq, thirdPartyReq,
+                                showStaticContentReq, showThirdPartyReq)) {
+            collapsed.css('display', 'table-row');
+          } else {
+            collapsed.css('display', 'none');
+          }
+          // also push into the table
+          $('tbody').append(collapsed);
+        }
+
+        i += 2;
       }
-    }
+    } // end while
     // Looks like we are done displaying current response
     // Now finish the remaining work (if any)
     if (entriesToProcess.length > 0) {
@@ -175,9 +184,11 @@ function toggleExpandedView(e) {
     // hook up hovers and stuff from interaction
     interactionSetup(`.index-${index}`);
     $(this).attr('state', 'expanded');
+    $(this).find('img').attr('src', 'toggle-up.svg');
   } else {
     $(`div.exchange[e-index="${index}"]`).remove();
     $(this).attr('state', 'collapsed');
+    $(this).find('img').attr('src', 'toggle-down.svg');
   }
 }
 
