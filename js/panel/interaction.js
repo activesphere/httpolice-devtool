@@ -1,26 +1,8 @@
 
 /* global document */
 
-function collapseAll(targetClass) {
-  const elems = document.querySelectorAll(`${targetClass} .notice`);
-  for (let i = 0; i < elems.length; i += 1) {
-    elems[i].classList.add('collapsed');
-  }
-}
-
 function onButtonClick() {
   this.parentElement.classList.toggle('collapsed');
-}
-
-function installButtons(targetClass) {
-  const notices = document.querySelectorAll(`${targetClass} .notice`);
-  for (let i = 0; i < notices.length; i += 1) {
-    const button = document.createElement('button');
-    button.setAttribute('type', 'button');
-    button.textContent = 'explain';
-    button.addEventListener('click', onButtonClick);
-    notices[i].insertBefore(button, notices[i].firstChild);
-  }
 }
 
 function highlightReferences() {
@@ -183,8 +165,8 @@ export function installOptions() {
 }
 
 export function interactionSetup(targetClass) {
-  collapseAll(targetClass);
-  installButtons(targetClass);
+//  collapseAll(targetClass);
+//  installButtons(targetClass);
   installHovers(targetClass);
-  toggleRemarks(false, targetClass);
+//  toggleRemarks(false, targetClass);
 }
