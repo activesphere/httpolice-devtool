@@ -7,7 +7,8 @@
 import $ from 'jquery';
 // import { interactionSetup, installOptions } from './interaction';
 import { REMOTE, BITESIZE } from '../defaults.js';
-import { randomString, visibilityByFlags, getTableRow } from '../util.js';
+import { visibilityByFlags, getTableRow } from '../util.js';
+import { interactionSetup } from './interaction.js';
 
 import './base.scss';
 import './httpmon.scss';
@@ -34,7 +35,6 @@ function handleResponse(initialReq) {
   return (resp) => {
     const jresp = JSON.parse(resp);
     const report = jresp.reports;
-    const randomClass = randomString();
 
     const $sections = $(report).find('section');
     if (initialReq) {
@@ -61,9 +61,9 @@ function handleResponse(initialReq) {
           id: currentId, url, staticContentReq, thirdPartyReq,
         });
 
-        $exchng.append($request.addClass(randomClass))
+        $exchng.append($request)
                .append('<hr>')
-               .append($response.addClass(randomClass))
+               .append($response)
                .append('<hr>');
 
         const collapsed = $(getTableRow($request.clone(), $response.clone(), currentId));
@@ -170,7 +170,10 @@ function toggleExpandedView(e) {
   const index = $item.attr('index');
   if (state === 'collapsed') {
     const expanded = globalExchanges[Number(index)].expanded;
+    expanded.find('section').addClass(`index-${index}`);
     $(this).after(expanded);
+    // hook up hovers and stuff from interaction
+    interactionSetup(`.index-${index}`);
     $(this).attr('state', 'expanded');
   } else {
     $(`div.exchange[e-index="${index}"]`).remove();
