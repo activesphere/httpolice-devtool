@@ -40,8 +40,9 @@ export function visibilityByFlags(
 export function getTableRow($request, $response, id) {
   const tableRow = $(
     `<tr index="${id}" state="collapsed">
-       <th></th>
-       <td></td>
+       <th class="head"></th>
+       <td class="row-icon"><img src="toggle-down.svg"></td>
+       <td class="note"></td>
      </tr>`
   );
 
@@ -50,9 +51,9 @@ export function getTableRow($request, $response, id) {
 
   $target.find('code span:eq(1)').text(cleanTarget);
 
-  tableRow.find('th').append($target);
+  tableRow.find('th.head').append($target);
   // the left side of the row
-  tableRow.find('td')
+  tableRow.find('td.note')
           .append($request.find('.error h3'))
           .append($response.find('.error h3'))
           .append($request.find('.comment h3'))
