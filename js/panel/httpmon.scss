@@ -71,6 +71,11 @@ button {
     cursor: pointer;
 }
 
+table img {
+    height: 14px;
+    width: 14px;
+}
+
 @media print {
     button {
         display: none;
