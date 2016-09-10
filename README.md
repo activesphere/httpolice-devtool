@@ -8,6 +8,10 @@ It intercepts and sends the HTTP headers from your browser to a server running [
 ### Install
 You can install the extension (in chrome browser) from [Chrome Store](https://chrome.google.com/webstore/detail/httpolice-devtool/hnlnhebgfcfemjaphgbeokdnfpgbnhgn). You should also consider running a local server (more on that below)
 
+### Screenshot
+
+![alt text](https://github.com/activesphere/httpolice-devtool/raw/master/Screen%20Shot%202016-09-09%20at%202.11.11%20PM.png "HTTPolice in chrome devtool")
+
 
 ### Run your own server
 
