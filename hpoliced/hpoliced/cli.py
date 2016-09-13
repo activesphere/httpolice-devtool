@@ -55,9 +55,9 @@ def har_input(data):
     # check
     for exch in exchanges:
         httpolice.check_exchange(exch)
-        if any(notice.severity > 1
-               for resp in exch.responses   # We only care about responses
-               for notice in resp.notices):
+        if any(notice.severity > httpolice.Severity.debug
+               for msg in [exch.request] + exch.responses
+               for notice in msg.notices):
             bad_exchanges.append(exch)
 
     # report
