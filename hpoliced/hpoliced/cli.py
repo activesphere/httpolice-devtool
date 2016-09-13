@@ -48,7 +48,7 @@ def har_input(data):
     creator = data['log']['creator']['name']
     bad_exchanges = []
     exchanges = [
-        _process_entry(entry, creator)
+        _process_entry(entry, creator, 'from chrome')
         for entry in data['log']['entries']
     ]
 
