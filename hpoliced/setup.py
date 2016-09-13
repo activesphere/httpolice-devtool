@@ -3,7 +3,7 @@ from setuptools import setup
 setup(
     name = 'hpoliced',
     packages = ['hpoliced'],
-    version = '0.0.3',
+    version = '0.0.4',
     description = 'Turns HTTPolice into a web server',
     author = 'ActiveSphere',
     author_email = 'shinde.rohitt@gmail.com',
@@ -12,7 +12,7 @@ setup(
     url = 'https://github.com/activesphere/httpolice-devtool/hpoliced',
 
     install_requires=[
-        'httpolice >= 0.2.0',
+        'httpolice >= 0.3.0',
         'bottle >= 0.12.9',
     ],
 
