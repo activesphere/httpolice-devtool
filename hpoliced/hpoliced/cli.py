@@ -5,9 +5,12 @@
 
 
 from bottle import route, run, abort, get, post, request, response
-from har import har_input
 from base64 import b64decode, b64encode
 
+import httpolice
+from httpolice.inputs.har import _process_entry
+
+import StringIO
 import argparse
 import bottle
 import json
@@ -39,6 +42,30 @@ def enable_cors(fn):
             return fn(*args, **kwargs)
 
     return _enable_cors
+
+
+def har_input(data):
+    creator = data['log']['creator']['name']
+    bad_exchanges = []
+    exchanges = [
+        _process_entry(entry, creator)
+        for entry in data['log']['entries']
+    ]
+
+    # check
+    for exch in exchanges:
+        httpolice.check_exchange(exch)
+        if any(notice.severity > 1
+               for resp in exch.responses   # We only care about responses
+               for notice in resp.notices):
+            bad_exchanges.append(exch)
+
+    # report
+    out = StringIO.StringIO()
+    if bad_exchanges:
+        httpolice.html_report(bad_exchanges, out)
+    return out
+
 
 @post('/har')
 @enable_cors
