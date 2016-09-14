@@ -225,6 +225,11 @@ function checkboxHandler() {
   reloadRows();
 }
 
+function clearPage() {
+  $('tr').remove();
+  $('.exchange').remove();
+}
+
 $(document).ready(() => {
   restoreRemoteURL();
   listenRemoteURLChanges();
@@ -237,7 +242,7 @@ $(document).ready(() => {
   backgroundPageConnection.onMessage.addListener((message) => {
     // Handle responses from the background page
     if (message.type === 'BEGIN') {
-      $('.exchange').remove();
+      clearPage();
       chrome.devtools.network.getHAR((harLog) => {
         entriesToProcess = harLog.entries.slice(5);
         harLog.entries = harLog.entries.slice(0, 5);
@@ -247,6 +252,11 @@ $(document).ready(() => {
               .onRequestFinished.addListener(processIndividualHar);
       });
     }
+  });
+
+  chrome.devtools.network.onNavigated.addListener(() => {
+    chrome.devtools.network.onRequestFinished
+          .removeListener(processIndividualHar);
   });
 
   backgroundPageConnection.postMessage({
