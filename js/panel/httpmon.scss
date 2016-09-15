@@ -93,7 +93,7 @@ body.report {
 
 div.exchange {
     background: white;
-    width: 120%;
+    width: 130%;
     /* margin-top: 3em; */
 }
 
@@ -289,4 +289,11 @@ form input + label, form label + input {
     background: lavender;
     border: solid thin gray;
     padding: 0 0.1em;
+}
+
+/* Ideally, this line should be in base.scss where most of the boostrap
+   stuff is (related to tables and stuff), but this only overrides whatever
+   is already there. And fixes a very annoying bug (page jumps on clicks) */
+th.head {
+    width: 76%;
 }
