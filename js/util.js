@@ -60,3 +60,10 @@ export function getTableRow($request, $response, id) {
           .append($response.find('.comment h3'));
   return tableRow;
 }
+
+export function clearPage() {
+  $('tr').remove();
+  $('.exchange').remove();
+  // Hide the messages
+  $('.message').css('display', 'none');
+}
