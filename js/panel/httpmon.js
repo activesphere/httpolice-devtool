@@ -7,8 +7,10 @@
 import $ from 'jquery';
 // import { interactionSetup, installOptions } from './interaction';
 import { REMOTE, BITESIZE } from '../defaults.js';
-import { visibilityByFlags, getTableRow } from '../util.js';
+import { visibilityByFlags, getTableRow, clearPage } from '../util.js';
 import { interactionSetup } from './interaction.js';
+
+import messages from '../messages.js';
 
 import './base.scss';
 import './httpmon.scss';
@@ -39,7 +41,7 @@ function handleResponse(initialReq) {
     const $sections = $(report).find('section');
     if (initialReq) {
       // clean old junk
-      $('.exchange').remove();
+      clearPage();
     }
 
     if ($sections.length > 0) {
@@ -105,9 +107,9 @@ function handleResponse(initialReq) {
   };
 }
 
-function handleError(response) {
-  // TODO show warnings!
-  console.log(`${response.status} : ${response.statusText}`);
+function handleError() {
+  messages('network-error');
+  console.log('hello');
 }
 
 function getChecked(payload, initial = false) {
@@ -225,14 +227,11 @@ function checkboxHandler() {
   reloadRows();
 }
 
-function clearPage() {
-  $('tr').remove();
-  $('.exchange').remove();
-}
-
 $(document).ready(() => {
   restoreRemoteURL();
   listenRemoteURLChanges();
+
+  messages('start');
 
   // Make a connection to the background script
   const backgroundPageConnection = chrome.runtime.connect({
@@ -255,6 +254,7 @@ $(document).ready(() => {
   });
 
   chrome.devtools.network.onNavigated.addListener(() => {
+    messages('loading');
     chrome.devtools.network.onRequestFinished
           .removeListener(processIndividualHar);
   });
