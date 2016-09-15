@@ -297,3 +297,13 @@ form input + label, form label + input {
 th.head {
     width: 76%;
 }
+
+.control-bar {
+    position: fixed;
+    top: 0;
+    margin: 0 auto;
+}
+
+.parent-table {
+    margin-top: 34px;
+}
