@@ -1,6 +1,6 @@
 {
   "name": "httpolice-devtool",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "manifest_version": 2,
   "description": "A lint-tool for the HTTP",
   "author": "ActiveSphere Technologies",
