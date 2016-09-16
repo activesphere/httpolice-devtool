@@ -10,7 +10,7 @@ import { REMOTE, BITESIZE } from '../defaults.js';
 import { visibilityByFlags, getTableRow, clearPage } from '../util.js';
 import { interactionSetup } from './interaction.js';
 
-import messages from '../messages.js';
+import messages, { hide } from '../messages.js';
 
 import './base.scss';
 import './httpmon.scss';
@@ -21,6 +21,7 @@ let searchQuery = '';
 // let showComments = false;
 let showStaticContentReq = true;
 let showThirdPartyReq = true;
+let recordLogs = false;
 
 const globalExchanges = [];
 const metadataIndex = [];
@@ -39,10 +40,6 @@ function handleResponse(initialReq) {
     const report = jresp.reports;
 
     const $sections = $(report).find('section');
-    if (initialReq) {
-      // clean old junk
-      clearPage();
-    }
 
     if ($sections.length > 0) {
       let i = 0;
@@ -85,6 +82,8 @@ function handleResponse(initialReq) {
             collapsed,
           });
 
+          // hide shown messages on page (if any)
+          hide();
           // apply css rule before inserting
           if (visibilityByFlags(staticContentReq, thirdPartyReq,
                                 showStaticContentReq, showThirdPartyReq)) {
@@ -223,6 +222,8 @@ function checkboxHandler() {
     showStaticContentReq = $(this).is(':checked');
   } else if (which === 'third-party-checkbox') {
     showThirdPartyReq = $(this).is(':checked');
+  } else if (which === 'request-log-checkbox') {
+    recordLogs = $(this).is(':checked');
   }
   reloadRows();
 }
@@ -241,7 +242,7 @@ $(document).ready(() => {
   backgroundPageConnection.onMessage.addListener((message) => {
     // Handle responses from the background page
     if (message.type === 'BEGIN') {
-      clearPage();
+      if (!recordLogs) clearPage();
       chrome.devtools.network.getHAR((harLog) => {
         entriesToProcess = harLog.entries.slice(5);
         harLog.entries = harLog.entries.slice(0, 5);
@@ -254,6 +255,7 @@ $(document).ready(() => {
   });
 
   chrome.devtools.network.onNavigated.addListener(() => {
+    if (!recordLogs) clearPage();
     messages('loading');
     chrome.devtools.network.onRequestFinished
           .removeListener(processIndividualHar);
@@ -269,4 +271,5 @@ $(document).ready(() => {
   // handle Search
   $(searchBarSelector).keydown(searchHandler);
   $('input[type="checkbox"]').change(checkboxHandler);
+  $('.clear-page').click(clearPage);
 });

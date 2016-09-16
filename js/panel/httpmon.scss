@@ -315,3 +315,14 @@ div.message {
     margin-top: 16%;
     font-size: 1.1em;
 }
+
+.input-group-sm {
+    position: relative;
+    display: table;
+    border-collapse: separate;
+}
+
+.input-group-addon {
+    padding: 2px 7px !important;
+    line-height: 0.3em !important;
+}

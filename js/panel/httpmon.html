@@ -8,19 +8,22 @@
     <div class="container">
       <!-- Example row of columns -->
       <div class="control-bar row">
-        <div class="input-group">
+        <div class="input-group-sm">
+          <div class="input-group-btn">
+            <button type="button" class="btn btn-default clear-page" aria-expanded="false">Clear Page</button>
+          </div><!-- /btn-group -->
           <input type="text" class="form-control" aria-label="..." placeholder="Search for ...">
-          <!-- <span class="input-group-addon">
-               <input type="checkbox" id="comments-checkbox" aria-label="...">
-               <label>Show commends and warnings</label>
-               </span> -->
           <span class="input-group-addon">
             <input type="checkbox" id="static-checkbox" aria-label="..." checked>
-            <label>Show static content requests</label>
+            <label>Static content requests</label>
           </span>
           <span class="input-group-addon">
             <input type="checkbox" id="third-party-checkbox" aria-label="..." checked>
-            <label>Show third party requests</label>
+            <label>Third party requests</label>
+          </span>
+          <span class="input-group-addon">
+            <input type="checkbox" id="request-log-checkbox" aria-label="...">
+            <label>Record request logs</label>
           </span>
         </div><!-- /input-group -->
       </div>

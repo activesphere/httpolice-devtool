@@ -2,22 +2,35 @@
 /* Handles displaying for status, error messages */
 import $ from 'jquery';
 
-function show(htmlText) {
+export function hide() {
+  $('.message').css('display', 'none');
+}
+
+function show() {
+  $('.message').css('display', 'block');
+}
+
+function toMessage(htmlText) {
   $('.message').html(htmlText);
+  show();
 }
 
 export default function messages(code) {
-  // make sure the thing is visible
-  $('.message').css('display', 'block');
   // handle various kinds
   if (code === 'start') {
-    show(`<p>Hit <strong>Refresh</strong> to start recording
+    toMessage(`<p>Hit <strong>Refresh</strong> to start recording
           the network activity</p>`);
   } else if (code === 'loading') {
-    show('<p>Loading...</p>');
+    /* show only if there is nothing in the page */
+    if (!$('tr').length > 0) {
+      toMessage('<p>Loading...</p>');
+    } else {
+      // make sure it's hidden
+      hide();
+    }
   } else if (code === 'network-error') {
-    show(`<p>Network Error<p>
-          <p>Make sure the <strong>server is running</strong>
-             and the <strong>address is correct</strong>.</p>`);
+    toMessage(`<p>Network Error<p>
+               <p>Make sure the <strong>server is running</strong>
+               and the <strong>address is correct</strong>.</p>`);
   }
 }
