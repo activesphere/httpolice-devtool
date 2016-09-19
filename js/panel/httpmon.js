@@ -11,6 +11,9 @@ import { visibilityByFlags, getTableRow, clearPage } from '../util.js';
 import { interactionSetup } from './interaction.js';
 
 import messages, { hide } from '../messages.js';
+import { checkboxHandler, searchHandler,
+         reloadRows, toggleExpandedView } from './event_handlers.js';
+import initStorage from './storage.js';
 
 import './base.scss';
 import './httpmon.scss';
@@ -31,7 +34,10 @@ const globalHarLog = {
 };
 
 let entriesToProcess = [];
-let userRemote = REMOTE;
+const server = {
+  remote: REMOTE,
+  local: REMOTE, // set to remote by default.
+};
 
 
 function handleResponse(initialReq) {
@@ -108,12 +114,11 @@ function handleResponse(initialReq) {
 
 function handleError() {
   messages('network-error');
-  console.log('hello');
 }
 
 function getChecked(payload, initial = false) {
   $.ajax({
-    url: userRemote,
+    url: server.userRemote,
     type: 'POST',
     data: { payload },
     success: handleResponse(initial),
@@ -154,84 +159,8 @@ function processIndividualHar(req, initial = false) {
   getChecked(payload, initial);
 }
 
-function restoreRemoteURL() {
-  // Set userRemote to user defined value
-  chrome.storage.sync.get({
-    remote: REMOTE,
-  }, (items) => {
-    userRemote = items.remote;
-  });
-}
-
-function listenRemoteURLChanges() {
-  chrome.storage.onChanged.addListener((changes) => {
-    if ({}.hasOwnProperty.call(changes, 'remote')) {
-      const oldVal = changes.remote.oldValue;
-      const newVal = changes.remote.newValue;
-      userRemote = oldVal === newVal ? oldVal : newVal;
-    }
-  });
-}
-
-function toggleExpandedView(e) {
-  e.preventDefault();
-  const $item = $(this);
-  const state = $item.attr('state');
-  const index = $item.attr('index');
-  if (state === 'collapsed') {
-    const expanded = globalExchanges[Number(index)].expanded;
-    expanded.find('section').addClass(`index-${index}`);
-    $(this).after(expanded);
-    // hook up hovers and stuff from interaction
-    interactionSetup(`.index-${index}`);
-    $(this).attr('state', 'expanded');
-    $(this).find('img').attr('src', 'toggle-up.svg');
-  } else {
-    $(`div.exchange[e-index="${index}"]`).remove();
-    $(this).attr('state', 'collapsed');
-    $(this).find('img').attr('src', 'toggle-down.svg');
-  }
-}
-
-function reloadRows() {
-  const idsToShow = metadataIndex.filter(
-    val => val.url.search(searchQuery) > -1 &&
-         visibilityByFlags(val.staticContentReq, val.thirdPartyReq,
-                           showStaticContentReq, showThirdPartyReq)
-  ).map(val => val.id);
-
-  $('tr').each(function scroller() {
-    const index = Number($(this).attr('index'));
-    if (idsToShow.includes(index)) {
-      $(this).css('display', 'table-row');
-    } else {
-      $(this).css('display', 'none');
-    }
-  });
-}
-
-function searchHandler(e) {
-  if (e.which === 13) e.preventDefault();
-  searchQuery = $(searchBarSelector).val().trim();
-  reloadRows();
-}
-
-function checkboxHandler() {
-  const which = $(this).attr('id');
-  if (which === 'static-checkbox') {
-    showStaticContentReq = $(this).is(':checked');
-  } else if (which === 'third-party-checkbox') {
-    showThirdPartyReq = $(this).is(':checked');
-  } else if (which === 'request-log-checkbox') {
-    recordLogs = $(this).is(':checked');
-  }
-  reloadRows();
-}
-
 $(document).ready(() => {
-  restoreRemoteURL();
-  listenRemoteURLChanges();
-
+  initStorage(server);
   messages('start');
 
   // Make a connection to the background script
@@ -267,9 +196,22 @@ $(document).ready(() => {
   });
 
   // hook up functions to Expand, and Collapse the rows
-  $('table').on('click', 'tr', toggleExpandedView);
+  $('table').on('click', 'tr',
+                toggleExpandedView(globalExchanges, interactionSetup));
+
   // handle Search
-  $(searchBarSelector).keydown(searchHandler);
-  $('input[type="checkbox"]').change(checkboxHandler);
+  $(searchBarSelector).keydown((e) => {
+    searchQuery = searchHandler(e);
+    reloadRows(
+      metadataIndex, searchQuery, showStaticContentReq, showThirdPartyReq
+    );
+  });
+
+  $('input[type="checkbox"]').change(() => {
+    ({ showStaticContentReq, showThirdPartyReq, recordLogs } = checkboxHandler());
+    reloadRows(
+      metadataIndex, searchQuery, showStaticContentReq, showThirdPartyReq
+    );
+  });
   $('.clear-page').click(clearPage);
 });
