@@ -1,5 +1,5 @@
 import $ from 'jquery';
-import { visibilityByFlags } from '../util.js';
+import { visibilityByFlags, splitByWindowSize } from '../util.js';
 
 export function reloadRows(
   metadataIndex, searchQuery, showStaticContentReq, showThirdPartyReq
@@ -56,4 +56,22 @@ export function toggleExpandedView(globalExchanges, interactionSetup) {
       $target.find('img').attr('src', 'toggle-down.svg');
     }
   };
+}
+
+
+export function resizeRowHead() {
+  $('tr').each(function scroller() {
+    const $th = $(this).find('th h2 span:eq(1)');
+    const th = $th.text();
+    const rth = $th.attr('remaining-th');
+    let allText = th.replace('...', '');
+
+    allText = rth ? allText + rth : allText;
+
+    // now get th comfortablely long enough
+    const [nth, nrth] = splitByWindowSize(allText);
+    // set it in the row
+    $th.text(nth);
+    $th.attr('remaining-th', nrth);
+  });
 }

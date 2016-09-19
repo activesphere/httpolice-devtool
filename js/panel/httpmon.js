@@ -1,8 +1,4 @@
-/* global chrome */
-/* global document */
-/* global btoa */
-/* global atob */
-/* global alert */
+/* global chrome document btoa atob window */
 
 import $ from 'jquery';
 // import { interactionSetup, installOptions } from './interaction';
@@ -12,7 +8,8 @@ import { interactionSetup } from './interaction.js';
 
 import messages, { hide } from '../messages.js';
 import { checkboxHandler, searchHandler,
-         reloadRows, toggleExpandedView } from './event_handlers.js';
+         reloadRows, toggleExpandedView,
+         resizeRowHead } from './event_handlers.js';
 import initStorage from './storage.js';
 
 import './base.scss';
@@ -214,4 +211,6 @@ $(document).ready(() => {
     );
   });
   $('.clear-page').click(clearPage);
+
+  $(window).resize(resizeRowHead);
 });
