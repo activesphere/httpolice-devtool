@@ -1,6 +1,8 @@
 import $ from 'jquery';
 import { visibilityByFlags, splitByWindowSize } from '../util.js';
 
+/* global document window */
+
 export function reloadRows(
   metadataIndex, searchQuery, showStaticContentReq, showThirdPartyReq
 ) {
@@ -58,6 +60,37 @@ export function toggleExpandedView(globalExchanges, interactionSetup) {
   };
 }
 
+function deSelectRow() {
+  // remove any exchanges if already present
+  $('div.exchange').remove();
+  // (de)select row (if there's one already selected)
+  $('.selected-row').removeClass('selected-row');
+}
+
+function removeExpandedView() {
+  $(this).parents('div.exchange').remove();
+  deSelectRow();
+}
+
+export function addSidebar(globalExchanges, interactionSetup) {
+  return (e) => {
+    e.preventDefault();
+    const $target = $(e.currentTarget);
+    const index = $target.attr('index');
+    if (!$target.hasClass('selected-row')) {
+      // so this is a different row
+      deSelectRow();
+      $target.addClass('selected-row');
+      // now add the exchange that belongs to this row
+      const expanded = globalExchanges[Number(index)].expanded;
+      expanded.find('section').addClass(`index-${index}`);
+      $target.after(expanded);
+      // hook up hovers and stuff from interaction
+      interactionSetup(`.index-${index}`);
+      $('button.ex-cls').click(removeExpandedView);
+    }
+  };
+}
 
 export function resizeRowHead() {
   $('tr').each(function scroller() {
@@ -73,5 +106,20 @@ export function resizeRowHead() {
     // set it in the row
     $th.text(nth);
     $th.attr('remaining-th', nrth);
+  });
+}
+
+function resizeSidebar(e) {
+  const $exchange = $('div.exchange');
+  const windowWidth = $(window).width();
+  if (e.clientX > 70 && (windowWidth - e.clientX > 100)) {
+    $exchange.css('left', `${e.clientX}px`);
+  }
+}
+
+export function resizeOnDrag() {
+  $(document).on('mousemove', resizeSidebar);
+  $(document).one('mouseup', () => {
+    $(document).off('mousemove', resizeSidebar);
   });
 }

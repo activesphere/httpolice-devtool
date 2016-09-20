@@ -8,8 +8,8 @@ import { interactionSetup } from './interaction.js';
 
 import messages, { hide } from '../messages.js';
 import { checkboxHandler, searchHandler,
-         reloadRows, toggleExpandedView,
-         resizeRowHead } from './event_handlers.js';
+         reloadRows, resizeOnDrag,
+         resizeRowHead, addSidebar } from './event_handlers.js';
 import initStorage from './storage.js';
 
 import './base.scss';
@@ -77,6 +77,14 @@ function handleResponse(initialReq) {
                  .append('<hr>')
                  .append($response)
                  .append('<hr>');
+
+          // add a draggable sidebar
+          $exchng.prepend('<div class="drag-border"></div>');
+          // add a button to close expanded view in UI v2. (proposal for #4)
+          const closeBtn = `<button type="button"
+                                    class="btn btn-default ex-cls">
+                            x</button>`;
+          $exchng.prepend(closeBtn);
 
           const collapsed = $(getTableRow($request.clone(), $response.clone(), currentId));
           const expanded = $exchng;
@@ -194,7 +202,7 @@ $(document).ready(() => {
 
   // hook up functions to Expand, and Collapse the rows
   $('table').on('click', 'tr',
-                toggleExpandedView(globalExchanges, interactionSetup));
+                addSidebar(globalExchanges, interactionSetup));
 
   // handle Search
   $(searchBarSelector).keydown((e) => {
@@ -213,4 +221,6 @@ $(document).ready(() => {
   $('.clear-page').click(clearPage);
 
   $(window).resize(resizeRowHead);
+
+  $(document).on('mousedown', '.drag-border', resizeOnDrag);
 });

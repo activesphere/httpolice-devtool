@@ -17,7 +17,7 @@ body {
 
 @media screen {                             /* Print margins are OK already. */
     body {
-        margin: 2em;
+        margin: 2px;
     }
 }
 
@@ -93,18 +93,39 @@ body.report {
 
 div.exchange {
     background: white;
-    width: 130%;
-    /* margin-top: 3em; */
+    position: fixed;
+    top: 30px;
+    right: 0px;
+    bottom: 0px;
+    left: 70px;
+    overflow: scroll;
+}
+
+button.ex-cls {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    padding: 5px 10px;
+    font-size: 12px;
+    border: none;
+}
+
+.drag-border {
+  position: absolute;
+  width: 2em;
+  height: 100%;
+  left: 0;
+  top: 30px;
+  bottom: 0;
+  cursor: col-resize;
 }
 
 @media screen {
     div.exchange {
         /* Bottom padding is smaller
          * because there is an invisible ``hr`` there. */
-        padding: 2em 2em 1.5em 2em;
-        border-top: solid thin $border-color;
+        padding: 0px 2em 1.5em 2em;
         border-left: solid thin $border-color;
-        border-right: solid thin $border-color;
     }
 }
 
@@ -295,7 +316,16 @@ form input + label, form label + input {
    stuff is (related to tables and stuff), but this only overrides whatever
    is already there. And fixes a very annoying bug (page jumps on clicks) */
 th.head {
-    width: 76%;
+    /* width: 71% !important; */
+}
+
+td h3 {
+    margin: 0px;
+}
+
+tr.selected-row {
+    color: #fff;
+    background-color: #3879d9;
 }
 
 .control-bar {
@@ -305,7 +335,7 @@ th.head {
 }
 
 .parent-table {
-    margin-top: 34px;
+    margin-top: 29.4px;
 }
 
 div.message {
@@ -325,4 +355,6 @@ div.message {
 .input-group-addon {
     padding: 2px 7px !important;
     line-height: 0.3em !important;
+    font-size: 11px !important;
+    background-color: #fff;
 }

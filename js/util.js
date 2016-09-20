@@ -68,7 +68,6 @@ export function getTableRow($request, $response, id) {
   const tableRow = $(
     `<tr index="${id}" state="collapsed">
        <th class="head"></th>
-       <td class="row-icon"><img src="toggle-down.svg"></td>
        <td class="note"></td>
      </tr>`
   );
