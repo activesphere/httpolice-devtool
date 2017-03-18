@@ -1,5 +1,5 @@
 
-/* global document */
+/* global document window */
 
 function onButtonClick() {
   this.parentElement.classList.toggle('collapsed');
@@ -43,6 +43,18 @@ function installHovers(targetClass) {
   for (let i = 0; i < notices.length; i += 1) {
     notices[i].addEventListener('mouseover', highlightReferences);
     notices[i].addEventListener('mouseout', clearHighlights);
+  }
+}
+
+function openInNewWindow(e) {
+  e.preventDefault();
+  window.open(e.target.href);
+}
+
+function installLinkHandlers(targetClass) {
+  const anchors = document.querySelectorAll(`${targetClass} a`);
+  for (let i = 0; i < anchors.length; i += 1) {
+    anchors[i].addEventListener('click', openInNewWindow);
   }
 }
 
@@ -168,5 +180,6 @@ export function interactionSetup(targetClass) {
 //  collapseAll(targetClass);
 //  installButtons(targetClass);
   installHovers(targetClass);
+  installLinkHandlers(targetClass);
 //  toggleRemarks(false, targetClass);
 }
