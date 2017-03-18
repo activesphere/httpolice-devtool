@@ -30,8 +30,7 @@ const splitByLimit = (title, limit) => {
   if (title.length < limit) {
     return [title, ''];
   }
-  return [`${title.slice(0, limit)}...`,
-          title.slice(limit)];
+  return [`${title.slice(0, limit)}...`, title.slice(limit)];
 };
 
 export function splitByWindowSize(title) {
