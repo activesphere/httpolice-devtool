@@ -51,10 +51,10 @@ function openInNewWindow(e) {
   window.open(e.target.href);
 }
 
-function installLinkHandlers(targetClass) {
+function installLinkHandlers(targetClass, handler) {
   const anchors = document.querySelectorAll(`${targetClass} a`);
   for (let i = 0; i < anchors.length; i += 1) {
-    anchors[i].addEventListener('click', openInNewWindow);
+    anchors[i].addEventListener('click', handler);
   }
 }
 
@@ -180,6 +180,6 @@ export function interactionSetup(targetClass) {
 //  collapseAll(targetClass);
 //  installButtons(targetClass);
   installHovers(targetClass);
-  installLinkHandlers(targetClass);
+  installLinkHandlers(targetClass, openInNewWindow);
 //  toggleRemarks(false, targetClass);
 }
